@@ -29,8 +29,17 @@ extension Array<CGPoint> {
 			self[i] = self[i] + offset
 		}
 	}
+	
+	public static func +(lhs: Array<CGPoint>, rhs: CGPoint) -> [CGPoint] {
+		return lhs.map({$0 + rhs})
+	}
 }
 
+extension Array<String> {
+	var toPoints: [CGPoint] {
+		return self.map({NSCoder.cgPoint(for: $0)})
+	}
+}
 
 infix operator +: AdditionPrecedence
 infix operator -: AdditionPrecedence

@@ -8,8 +8,8 @@
 
 import Foundation
 import CoreData
+import UIKit
 
 @objc(LineData)
 public class LineData: NSManagedObject {
-
 }

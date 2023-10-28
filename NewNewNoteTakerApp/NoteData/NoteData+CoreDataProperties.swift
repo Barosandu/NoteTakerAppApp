@@ -8,6 +8,7 @@
 
 import Foundation
 import CoreData
+import UIKit
 
 
 extension NoteData {
@@ -21,6 +22,7 @@ extension NoteData {
     @NSManaged public var dateCreated: Date?
     @NSManaged public var pageCount: Int64
     @NSManaged public var pages: Set<PageData>
+	@NSManaged public var thumbnail: UIImage
 	
 	func getSortedPages() -> [PageData] {
 		return pages.sorted { a, b in
@@ -35,6 +37,8 @@ extension NoteData {
 		let note = NoteData(context: Database.context()!)
 		note.name = name
 		note.id = UUID()
+		note.dateCreated = Date()
+		note.thumbnail = UIImage.init()
 		return note
 		
 	}

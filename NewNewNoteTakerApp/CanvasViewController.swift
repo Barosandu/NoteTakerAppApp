@@ -99,6 +99,8 @@ class CanvasViewController: UIViewController, UIScrollViewDelegate {
 	}
 	
 	override func viewWillDisappear(_ animated: Bool) {
+		GLOBAL.currentNote?.thumbnail = self.firstPageView.imageFromSelf()
+		Database.getNotes()
 		NotificationCenter.default.removeObserver(self.addNewpageObserver as Any)
 	}
 	

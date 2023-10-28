@@ -10,7 +10,7 @@ import UIKit
 import CoreData
 
 class GLOBAL {
-	static var noteThumbnailDimensions = GLOBAL.pageDimensions / 6
+	static var noteThumbnailDimensions = GLOBAL.pageDimensions / 3
 	static var currentNote: NoteData? = nil {
 		willSet {
 			if self.currentNote?.id != newValue?.id {
@@ -45,10 +45,14 @@ class GLOBAL {
 
 @propertyWrapper class InstantaneousValue<T: AdditiveArithmetic> {
 	private var presentValue: T
-	private var oldValue: T
-	var instantaneousChange: T {
+	private(set) var oldValue: T?
+	private(set) var firstValue: T?
+	var instantaneousChange: T? {
 		get {
-			return presentValue - oldValue
+			if(self.oldValue == nil) {
+				return nil
+			}
+			return presentValue - oldValue!
 		}
 	}
 	var wrappedValue: T {
@@ -56,15 +60,23 @@ class GLOBAL {
 			return presentValue
 		}
 		set(val) {
+			if self.wrappedValue != .zero && self.firstValue == nil {
+				self.firstValue = val
+			}
 			self.oldValue = self.presentValue
 			self.presentValue = val
 		}
 	}
 	
 	init(wrappedValue: T) {
-		self.presentValue = T.zero
+		self.presentValue = wrappedValue
 		self.oldValue = T.zero
+		self.firstValue = nil
 		self.wrappedValue = wrappedValue
+	}
+	
+	func resetFirstVal() {
+		self.firstValue = nil
 	}
 	
 }
@@ -83,9 +95,11 @@ class Database {
 		}
 	}
 	
-	static func getNotes() -> [NoteData] {
+	static var notes = [NoteData]()
+	static func getNotes() {
+		print("Getting notes")
 		let notes = try? Database.context()?.fetch(NoteData.fetchRequest())
-		return notes ?? []
+		Self.notes = notes ?? []
 	}
 }
 
