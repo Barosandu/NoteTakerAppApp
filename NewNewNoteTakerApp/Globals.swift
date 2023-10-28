@@ -95,11 +95,5 @@ class Database {
 		}
 	}
 	
-	static var notes = [NoteData]()
-	static func getNotes() {
-		print("Getting notes")
-		let notes = try? Database.context()?.fetch(NoteData.fetchRequest())
-		Self.notes = notes ?? []
-	}
 }
 

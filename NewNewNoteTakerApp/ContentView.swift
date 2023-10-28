@@ -11,7 +11,8 @@ import CoreData
 
 struct ContentView: View {
 	@State private var currentTool: LineType = .move
-	@State private var allNotes = [NoteData]()
+	@FetchRequest(entity: NoteData.entity(), sortDescriptors: [.init(.init(\NoteData.name, order: .forward))]) var notes: FetchedResults<NoteData>
+	@Environment(\.managedObjectContext) var moc
 	@State private var showAddnotePopup: Bool = false
 	@State var path: NavigationPath = .init()
 	@Environment(\.isPresented) var isPresented
@@ -20,38 +21,31 @@ struct ContentView: View {
 			GeometryReader { geo in
 				ScrollView {
 					LazyVGrid(columns: [.init(.adaptive(minimum: GLOBAL.noteThumbnailDimensions.width, maximum: GLOBAL.noteThumbnailDimensions.width))]) {
-						ForEach(self.allNotes, id: \.id) { note in
-							NavigationLink {
-								NoteView(currentNote: note)
-									.ignoresSafeArea()
-							} label: {
+						ForEach(self.notes, id: \.id) { note in
+							NavigationLink(value: note, label: {
 								Label(currentNote: note)
-							}.buttonStyle(.plain)
+							}).buttonStyle(.plain)
 						}
 					}
 				}
 			}
-				.toolbar {
-					ToolbarItemGroup(placement: .automatic) {
-						Button(.init("Add note"), systemImage: "square.and.pencil") {
-							self.showAddnotePopup = true
-						}
-						.onAppear {
-							Database.getNotes()
-							self.allNotes = Database.notes
-						}
-						.sheet(isPresented: self.$showAddnotePopup) {
-							AddNote(allNotes: self.$allNotes)
-						}
+			.navigationDestination(for: NoteData.self, destination: { note in
+				NoteView(currentNote: note)
+					.ignoresSafeArea()
+			})
+			.toolbar {
+				ToolbarItemGroup(placement: .automatic) {
+					Button(.init("Add note"), systemImage: "square.and.pencil") {
+						self.showAddnotePopup = true
 					}
-					ToolbarItem(placement: .topBarLeading) {
-						Text("Welcome to NoteTaker")
+					.onAppear {
+						Database.save()
+					}
+					.sheet(isPresented: self.$showAddnotePopup) {
+						AddNote()
 					}
 				}
-				.onAppear {
-					Database.getNotes()
-					self.allNotes = Database.notes
-				}
+			}
 		}
 	}
 }
@@ -102,7 +96,6 @@ struct Label: View {
 
 struct AddNote: View {
 	@State private var noteName = ""
-	@Binding var allNotes: [NoteData]
 	@Environment(\.dismiss) var dismiss
 	var body: some View {
 		NavigationStack {
@@ -124,8 +117,7 @@ struct AddNote: View {
 						Button("Add") {
 							let note = NoteData.newNote(name: self.noteName)
 							let _ = note
-							Database.getNotes()
-							self.allNotes = Database.notes
+						
 						}
 					}
 				}

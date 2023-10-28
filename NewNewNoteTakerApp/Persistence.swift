@@ -22,7 +22,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 		save()
 	}
 	
-	lazy var persistenceContainer: NSPersistentContainer = {
+	var persistenceContainer: NSPersistentContainer = {
 		let container = NSPersistentContainer(name: "NewNewNoteTakerApp")
 		container.loadPersistentStores(completionHandler: { (storeDescription, error) in
 			if let error = error as NSError? {

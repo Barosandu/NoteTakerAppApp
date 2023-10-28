@@ -15,6 +15,7 @@ struct NewNewNoteTakerAppApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+				.environment(\.managedObjectContext, appDelegate.persistenceContainer.viewContext)
 				.onAppear {
 					AppDelegate.shared = appDelegate
 				}
